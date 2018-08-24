@@ -1,0 +1,118 @@
+CREATE DATABASE pravana;
+
+USE pravana;
+
+CREATE TABLE clientes(
+    id_cliente INT(255) PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255),
+    direccion VARCHAR(255),
+    codigoPostal VARCHAR(255),
+    telefono VARCHAR(255),
+    rfc VARCHAR(255),
+    usoFactura VARCHAR(255),
+    metodoPago VARCHAR(255),
+    email VARCHAR(255)
+);
+
+CREATE TABLE departamento(
+    id_departamento INT(255) PRIMARY KEY AUTO_INCREMENT,
+    nombre_departamento VARCHAR(255)
+);
+
+CREATE TABLE productos(
+    id_producto VARCHAR(500) PRIMARY KEY,
+    descripcion VARCHAR(255),
+    costo FLOAT(25,2),
+    mayoreo FLOAT(25,2),
+    publico FLOAT(25,2),
+    minimo INT(25),
+    existencia INT(25),
+    fk_departamento INT,
+    FOREIGN KEY (fk_departamento) REFERENCES departamento (id_departamento)
+);
+
+CREATE TABLE usuarios(
+    id_usuario INT(255) PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255),
+    password VARCHAR(40),
+    habilitado TINYINT(1),
+    tipo TINYINT(1)
+);
+
+CREATE TABLE ventas(
+    id_venta INT(255) PRIMARY KEY AUTO_INCREMENT,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total FLOAT(25,2),
+    metodoPago VARCHAR(255),
+    fk_usuario INT,
+    FOREIGN KEY (fk_usuario) REFERENCES usuarios (id_usuario)
+);
+
+CREATE TABLE venta_productos(
+    fk_producto VARCHAR(500) NOT NULL,
+    cantidad INT(11),
+    fk_venta INT NOT NULL,
+    FOREIGN KEY (fk_producto) REFERENCES productos (id_producto),
+    FOREIGN KEY (fk_venta) REFERENCES ventas (id_venta)
+);
+
+CREATE TABLE creditos(
+    id_credito INT(255) PRIMARY KEY AUTO_INCREMENT,
+    fk_venta INT(255) NOT NULL,
+    fk_cliente INT(255) NOT NULL,
+    liquidado TINYINT(1),
+    FOREIGN KEY (fk_venta) REFERENCES ventas (id_venta),
+    FOREIGN KEY (fk_cliente) REFERENCES clientes (id_cliente)
+);
+
+CREATE TABLE abonosgeneral(
+    id_abono INT(255) PRIMARY KEY AUTO_INCREMENT,
+    cantidad FLOAT(25,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fk_cliente INT(255) NOT NULL,
+    FOREIGN KEY (fk_cliente) REFERENCES clientes (id_cliente)
+);
+
+
+CREATE TABLE abonos(
+    id_abono INT PRIMARY KEY AUTO_INCREMENT,
+    cantidad FLOAT(25,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fk_credito INT NOT NULL,
+    fk_abonogeneral INT NOT NULL,
+    FOREIGN KEY (fk_credito) REFERENCES creditos(id_credito),
+    FOREIGN KEY (fk_abonogeneral) REFERENCES abonosgeneral(id_abono)
+);
+
+CREATE TABLE movimientos(
+    id_movimiento INT PRIMARY KEY AUTO_INCREMENT,
+    tipo VARCHAR(255),
+    fecha DATE,
+    fk_usuario INT,
+    FOREIGN KEY (fk_usuario) REFERENCES usuarios (id_usuario)
+);
+
+CREATE TABLE citas(
+    id_cita INT PRIMARY KEY AUTO_INCREMENT,
+    fecha DATE,
+    fk_cliente INT,
+    fk_usuario INT,
+    notas VARCHAR(255),
+    FOREIGN KEY (fk_cliente) REFERENCES clientes (id_cliente),
+    FOREIGN KEY (fk_usuario) REFERENCES usuarios (id_usuario)
+);
+
+CREATE TABLE gastos(
+    id_gasto INT PRIMARY KEY AUTO_INCREMENT,
+    concepto VARCHAR(255),
+    cantidad FLOAT(25,2),
+    fecha DATE,
+    notas VARCHAR(255),
+    fk_usuario INT,
+    FOREIGN KEY (fk_usuario) REFERENCES usuarios (id_usuario)
+);
+
+INSERT INTO usuarios (nombre,password,tipo,habilitado) VALUES ('admin',MD5('123456'),1,1);
+
+
+	
